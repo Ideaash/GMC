@@ -37,7 +37,22 @@ Vagrant.configure("2") do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network", ip:"192.168.1.14"
+  #config.vm.network "public_network", ip:"192.168.1.14"
+
+  current_ip = `ifconfig | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'`.strip
+
+  ip_parts = current_ip.split('.')
+  last_octet = ip_parts[-1].to_i
+
+  # Ajoutez 1 ou soustrayez 1 au dernier octet de l'adresse IP actuelle
+  adjusted_last_octet = last_octet + 1
+
+  # Utilisez la nouvelle adresse IP dans la configuration Vagrant
+  adjusted_ip = "#{ip_parts[0]}.#{ip_parts[1]}.#{ip_parts[2]}.#{adjusted_last_octet}"
+  config.vm.network "public_network", ip: adjusted_ip
+
+
+
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
