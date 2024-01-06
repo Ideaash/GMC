@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
 
   # Créer une nouvelle adresse IP en utilisant les octets modifiés
   new_ip = octets.join('.')
-  puts "l'adresse ip générée ets : #{new_ip}" 
+  puts "L'adresse IP générée est : #{new_ip}"
   config.vm.network "public_network", ip: new_ip
 
   # Configuration spécifique au fournisseur VirtualBox
