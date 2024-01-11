@@ -1,2 +1,0 @@
-# GMC
-GMC Repo
