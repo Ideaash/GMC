@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+def clean_utf8_string(input)
+  input.encode('UTF-16', 'UTF-8', invalid: :replace, replace: '').encode('UTF-8')
+end
+
+# Fonction pour obtenir l'adresse IPv4 actuelle sur Windows
+def get_ipv4_address
+  ipv4_result = `powershell -Command "(Get-NetIPAddress -InterfaceAlias 'Wi-Fi' | Where-Object { $_.AddressFamily -eq 'IPv4' }).IPAddress"`
+  cleaned_ipv4_result = clean_utf8_string(ipv4_result).strip
+  raise "Impossible de récupérer l'adresse IP." if cleaned_ipv4_result.empty?
+  cleaned_ipv4_result
+end
+
+Vagrant.configure("2") do |config|
+  # Configuration principale
+  config.vm.box = "centos/7"
+  config.vm.synced_folder ".", "/vagrant", disabled: true 
+
+  # Obtenir l'adresse IPv4 actuelle sur Windows
+  current_ip = get_ipv4_address
+
+  # Convertir l'adresse IPv4 en un objet IPAddress
+  ip_object = current_ip
+
+  # Obtenir les octets de l'adresse IP
+  octets = ip_object.split('.').map(&:to_i)
+
+  # Ajouter 1 à la dernière partie de l'adresse IP
+  octets[-1] += 1
+
+  # Créer une nouvelle adresse IP en utilisant les octets modifiés
+  new_ip = octets.join('.')
+  puts "L'adresse IP générée est : #{new_ip}"
+  config.vm.network "public_network", ip: new_ip
+
+  # Configuration spécifique au fournisseur VirtualBox
+  config.vm.provider "virtualbox" do |vb|
+    # Paramètres de la machine virtuelle VirtualBox
+    # vb.gui = true
+    vb.memory = "5000"
+    vb.cpus = "2"
+  end
+
+  # Configuration de la provision avec un script shell
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo yum update
+    sudo yum install gedit
+  SHELL
+end
+
+
