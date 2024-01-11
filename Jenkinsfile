@@ -6,9 +6,9 @@ pipeline {
             steps {
                 script {
                     // Checkout the Git repository
-                    git branch: 'fatmaMaazoun',
+                    git branch: 'ideaash',
                     credentialsId: 'Github',
-                    url: 'https://github.com/moatezborgi/DevOpsKaddem.git'
+                    url: 'https://github.com/Ideaash/GMC.git'
                 }
             }
         }
@@ -42,24 +42,6 @@ pipeline {
             }
         }
 
-        stage("Docker Build and Push") {
-            steps {
-                script {
-                    // Build the Docker image
-                    sh 'docker build -t fatmamaazoun/fatmakaddem .'
-
-                    // Log in to Docker Hub
-                    sh "docker login -u fatmamaazoun -p github211"
-
-                    // Run the Docker container
-                    sh 'docker run -d -p 9091:9091 fatmamaazoun/fatmakaddem'
-
-                    // Push the Docker image to a Docker registry (e.g., Docker Hub)
-                    sh 'docker push fatmamaazoun/fatmakaddem'
-
-                    // Start a Docker Compose service (if needed)
-                    sh 'docker-compose up -d'
-                }
             }
         }
     }
